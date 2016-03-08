@@ -1,0 +1,13 @@
+/*@@var:*/
+variables
+{
+}
+/*@@end*/
+
+/*@@testfunction:StopTesterPresent():*/
+testfunction StopTesterPresent ()
+{
+    DiagStopTesterPresent("Engine");
+}
+/*@@end*/
+

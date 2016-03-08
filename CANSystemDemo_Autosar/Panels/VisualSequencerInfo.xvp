@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<Panel Type="Vector.CANalyzer.Panels.PanelSerializer, Vector.CANalyzer.Panels.Serializer, Version=7.5.37.0, Culture=neutral, PublicKeyToken=null">
+  <Object Type="Vector.CANalyzer.Panels.Runtime.Panel, Vector.CANalyzer.Panels.Common, Version=7.5.37.0, Culture=neutral, PublicKeyToken=null" Name="Panel1" Children="Controls" ControlName="Visual Sequencer Info">
+    <Object Type="Vector.CANalyzer.Panels.Design.GroupBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=7.5.37.0, Culture=neutral, PublicKeyToken=null" Name="GroupBoxControl1" Children="Controls" ControlName="GroupBoxControl1">
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=7.5.37.0, Culture=neutral, PublicKeyToken=null" Name="StaticTextControl3" Children="Controls" ControlName="StaticTextControl2">
+        <Property Name="Name">StaticTextControl3</Property>
+        <Property Name="Size">150, 79</Property>
+        <Property Name="Location">6, 135</Property>
+        <Property Name="BackColor">221, 221, 221</Property>
+        <Property Name="Text">Macros and sequences can be managed in the Automation Sequences dialog (menu: View | Automation Sequences).</Property>
+      </Object>
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=7.5.37.0, Culture=neutral, PublicKeyToken=null" Name="StaticTextControl2" Children="Controls" ControlName="StaticTextControl2">
+        <Property Name="Name">StaticTextControl2</Property>
+        <Property Name="Size">150, 43</Property>
+        <Property Name="Location">6, 86</Property>
+        <Property Name="BackColor">221, 221, 221</Property>
+        <Property Name="Text">To avoid conficts please stop the DrivingCycle macro before running the sequences.</Property>
+      </Object>
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=7.5.37.0, Culture=neutral, PublicKeyToken=null" Name="StaticTextControl1" Children="Controls" ControlName="StaticTextControl1">
+        <Property Name="Name">StaticTextControl1</Property>
+        <Property Name="Size">150, 59</Property>
+        <Property Name="Location">6, 23</Property>
+        <Property Name="BackColor">221, 221, 221</Property>
+        <Property Name="Text">This desktop has configured Visual Sequences for stimulating the PowerTrain bus of the configuration.</Property>
+      </Object>
+      <Property Name="Name">GroupBoxControl1</Property>
+      <Property Name="Size">162, 243</Property>
+      <Property Name="Location">7, 9</Property>
+      <Property Name="BackColor">221, 221, 221</Property>
+      <Property Name="Text">Visual Sequencer</Property>
+      <Property Name="TabIndex">0</Property>
+    </Object>
+    <Property Name="Name">Panel1</Property>
+    <Property Name="Size">176, 259</Property>
+    <Property Name="BackColor">221, 221, 221</Property>
+  </Object>
+</Panel>

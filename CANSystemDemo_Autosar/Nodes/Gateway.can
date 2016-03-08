@@ -1,0 +1,503 @@
+
+includes
+{
+  #include "..\CAPL Includes\NM_Observer_Include.cin"
+}
+variables
+{
+  int gShowMultiDisplay;
+
+  message EngineData gMsgEngineData;
+
+  // Variables for Transport-Layer
+  char gECU[12] = "%NODE_NAME%";
+
+  const int gTxSize = 4096;
+  const int gRxSize = 4096;
+
+  byte gTxDataBuffer[gTxSize];
+  byte gRxDataBuffer[gRxSize];
+ 
+  msTimer tWheelSpin; 
+
+  const int gWheelSpinTimerInterval = 186;
+  int gWheelSpin = 0;
+  
+  int gContextCount;
+  dword gContext;
+  
+  dword gNewPage; // Sink identifier
+  
+  int gEngineIsRunning = 0; 
+  int gActKeyPos = 0;
+
+  enum enumIgnition{IGN_OFF = 0, IGN_KEY = 1, IGN_KL15R = 2, IGN_KL15 = 3};
+
+  const long SA_COMFORT = 29;
+  const long SA_POWER_TRAIN = 26;
+}
+
+on start
+{   
+  SetBusContext(gBusContext_Comfort);
+  
+  // Send type: cyclic if active
+  $Comfort::Gateway_1::EngineRunning = @sysvar::ComfortBus::EngineRunning;
+  $Comfort::Gateway_1::Ig_15 = @sysvar::ComfortBus::IG_15;
+  $Comfort::Gateway_1::Ig_15R = @sysvar::ComfortBus::IG_15R;
+  $Comfort::Gateway_1::StarterKey = @sysvar::ComfortBus::StarterKey;
+
+  //Create a new page at the write window
+  gNewPage= writeCreate("Test Environment");
+  //display information for the test-setup
+  writeLineEx(gNewPage,1,"- Press <e> to start the engine node test");
+  writeLineEx(gNewPage,1,"- Use the interactive generator for sending a undefined message");
+
+  // set to 2 to get more information into write-window 
+  setWriteDbgLevel(1);
+  writeDbgLevel(2,"Gateway");
+
+  enableControl("Control", "Run", 0);
+
+  // Initialise TP-DLL for the bus of the current context
+  SetExtAddressingMode(); 
+}
+
+on message ABSdata
+{
+  double lastval;
+
+  SetBusContext(gBusContext_Comfort);
+
+  if(lastval != this.CarSpeed.phys && gEngineIsRunning)
+    $Gateway_2::CarSpeed = $ABSdata::CarSpeed;
+
+  lastval = this.CarSpeed.phys;
+}
+
+on message EngineData
+{
+  double lastEngTemp;
+  double lastPetrolLevel;
+  double lastEngSpeed;
+
+  SetBusContext(gBusContext_Comfort);
+
+  if (gEngineIsRunning) {
+    if (lastEngTemp != this.EngTemp.phys)
+      $Gateway_2::EngineTemp = this.EngTemp.phys;
+
+    if (lastPetrolLevel != this.PetrolLevel.phys)
+      $Gateway_2::PetrolLevel = this.PetrolLevel.phys;
+
+    if(lastEngSpeed != this.EngSpeed.phys)
+      $Gateway_2::EngSpeed = this.EngSpeed.phys;
+
+    lastEngTemp = this.EngTemp.phys;
+    lastPetrolLevel = this.PetrolLevel.phys;
+    lastEngSpeed = this.EngSpeed.phys;
+  }
+
+  gMsgEngineData = this;
+
+  if (gShowMultiDisplay == 2)
+  {
+    putValueToControl("Gateway","DisplayControl",gMsgEngineData);
+  }
+
+  if (gShowMultiDisplay == 3)
+  {
+    putValueToControl("Gateway","DisplayControl",gMsgEngineData.EngSpeed.phys);
+  }
+}
+
+on timer tWheelSpin
+{
+  if(gWheelSpin < 16) 
+  {
+    @sysvar::ComfortBus::EngineRunningWheel = gWheelSpin;
+    gWheelSpin ++;   
+  }
+  else
+  {
+    gWheelSpin = 0; 
+    @sysvar::ComfortBus::EngineRunningWheel = gWheelSpin;
+    gWheelSpin ++;
+  }
+  cancelTimer(this);
+  setTimer(this,gWheelSpinTimerInterval);
+}
+
+ExchangeData (long rxCount,dword busContext, char busContextString[], dword sendToBusContext)
+{
+  long src;
+  int i;
+
+  // Check Source Address
+  src = OSEKTL_GetSrcAdr();
+
+  if (busContext == gBusContext_Comfort)
+  {
+    if(src != 0x606)
+    {
+      writeDbgLevel(1,"%NODENAME% %s: received data from unknown source address: %X", busContextString, src );
+      return;
+    }
+  }
+  else if (busContext == gBusContext_PowerTrain)
+  {
+    if(src != 0x608)
+    {
+      writeDbgLevel(1,"%s %s: received data from unknown source address: %X", gECU, busContextString, src );
+      return;
+    }
+  }
+
+  /* Get received data */
+  OSEKTL_GetRxData( gRxDataBuffer, elcount(gRxDataBuffer) );
+
+  // Copy received data to tx buffer
+  for(i=0; i< rxCount; i++)
+  {
+    gTxDataBuffer[i] = gRxDataBuffer[i];
+  }
+    
+  TransmitData(rxCount, sendToBusContext);
+
+  writeDbgLevel(2,"%s %s: received data : %X", gECU, busContextString, gTxDataBuffer[0] );
+}
+
+OSEKTL_DataCon(long status)
+{
+  char busContextString[32];
+  dword busContext;
+  byte addressingMode; 
+
+  busContext = GetBusContext();
+
+  if(busContext == gBusContext_Comfort)
+  {
+    strncpy(busContextString,  gComfort, 32);
+  }
+  else if (busContext == gBusContext_PowerTrain)
+  {
+    strncpy(busContextString,  gPowerTrain, 32);
+  }
+
+  if (status != 0) 
+  {
+    switch (addressingMode)
+    {
+      case 0: writeDbgLevel(2,"CAPL: %s %s: data sent using normal addressing", gECU, busContextString); break;
+      case 1: writeDbgLevel(2,"CAPL: %s %s: data sent using extended addressing", gECU, busContextString); break;
+      case 2: writeDbgLevel(2,"CAPL: %s %s: data sent using normal fixed addressing", gECU, busContextString); break;
+      case 3: writeDbgLevel(2,"CAPL: %s %s: data sent using mixed addressing", gECU, busContextString); break;
+      default:writeDbgLevel(2,"CAPL: %s %s: data sent using unknown addressing", gECU, busContextString); break;
+    }
+  }  
+  else 
+  {
+    writeDbgLevel(1,"%s %s: tx error, status is %d", gECU, busContextString, status);   
+  } 
+}
+
+OSEKTL_DataInd( long rxCount )
+{
+  dword receiveContext;
+  dword transmitContext;
+  char busContextString[32];
+ 
+  receiveContext = GetBusContext();
+
+  if(receiveContext == gBusContext_Comfort)
+  {
+    strncpy(busContextString,  gComfort, 32);
+    transmitContext = gBusContext_PowerTrain;
+  }
+  else if (receiveContext == gBusContext_PowerTrain)
+  {
+    strncpy(busContextString,  gPowerTrain, 32);
+    transmitContext = gBusContext_Comfort;
+  }
+  writeDbgLevel(2,"%s %s : data indication called, RxCount = %d,", gECU, busContextString, rxCount);
+
+  ExchangeData(rxCount, receiveContext, busContextString, transmitContext);
+}
+
+OSEKTL_ErrorInd(int error)
+{
+  char busContextString[32];
+  dword busContext;
+ 
+  busContext = GetBusContext();
+
+  if(busContext == gBusContext_Comfort)
+  {
+    strncpy(busContextString,  gComfort, 32);
+  } 
+  else if (busContext == gBusContext_PowerTrain)
+  {
+    strncpy(busContextString,  gPowerTrain, 32);
+  }
+
+  switch (error)
+  {
+    case 1: writeDbgLevel(1,"CAPL: %s %s: Error (%d): Timeout while waiting for CF", gECU, busContextString, error);      break;
+    case 2: writeDbgLevel(1,"CAPL: %s %s: Error (%d): Timeout while waiting for FC", gECU, busContextString, error);      break;
+    case 3: writeDbgLevel(1,"CAPL: %s %s: Error (%d): Wrong Sequence Number", gECU, busContextString, error);             break;
+    case 4: writeDbgLevel(1,"CAPL: %s %s: Error (%d): TP_DLL busy", gECU, busContextString, error);                       break;
+    case 5: writeDbgLevel(1,"CAPL: %s %s: Error (%d): Unexpected PDU", gECU, busContextString, error);                    break;
+    case 6: writeDbgLevel(1,"CAPL: %s %s: Error (%d): Timeout while waiting for Tx-Ack", gECU, busContextString, error);  break;
+    case 7: writeDbgLevel(1,"CAPL: %s %s: Error (%d): WFT Overrun", gECU, busContextString, error);                       break;
+    default:writeDbgLevel(1,"CAPL: %s %s: Error (%d): unknown error", gECU, busContextString, error);                     break;
+  }
+}
+
+TransmitData (long size,dword busContext)
+{    
+  char busContextString[32];
+  int i;
+
+  SetBusContext(busContext);
+
+  if(busContext == gBusContext_Comfort)
+  {
+    OSEKTL_SetTgtAdr(0x606); // Set Target Adress
+    strncpy(busContextString,  gComfort, 32);
+  }
+  else if(busContext == gBusContext_PowerTrain)
+  {
+    OSEKTL_SetTgtAdr(0x608); // Set Target Adress
+    strncpy(busContextString,  gPowerTrain, 32);
+  }
+  writeDbgLevel(2,"%s : OSEKTL_DataReq with %d Bytes, Service = %d", gECU, size, (int)gTxDataBuffer[0]);
+   
+  OSEKTL_DataReq(gTxDataBuffer, size);
+}
+
+SetExtAddressingMode ()
+{
+  for(gContextCount = 0; gContextCount <2; gContextCount++)
+  {
+    // use extended addressing mode
+    OSEKTL_SetExtMode(); 
+       
+    gContext = gBusContext_Comfort == GetBusContext() ? gBusContext_PowerTrain : gBusContext_Comfort;
+
+    // set the context to the "other" bus...
+    SetBusContext(gContext);
+  }
+}
+
+on preStart
+{
+  if (0 == gBusContext_Comfort)
+  {
+    writeex( 0, 3, "Error: Cannot determine context for bus: %s", gComfort);
+  }
+
+  if (0 == gBusContext_PowerTrain)
+  {
+    writeex( 0, 3, "Error: Cannot determine context for bus: %s", gPowerTrain);
+  }   
+  
+  if( GetBusContext() == gBusContext_Comfort)
+  { 
+    // Nm_CtrlSimulationOff(); // Disable ASR NM on Comfort
+     Nm_SetAutoStartParam(0);
+     ILSetAutoStartParam(0);
+  } 
+  else if( GetBusContext() == gBusContext_PowerTrain)
+  {
+    //ILConfigureNMNotifications(0,1);
+    Nm_SetAutoStartParam(0);
+    ILSetAutoStartParam(0);
+  }
+}
+
+CallbackInfo (char apName[])
+{
+  if( GetBusContext() == gBusContext_Comfort)
+  { 
+    writeDbgLevel(2,"%s is called on Comfort", apName);
+  } 
+  else if( GetBusContext() == gBusContext_PowerTrain)
+  {
+    writeDbgLevel(2,"%s is called on PowerTrain", apName);
+  }
+}
+
+on message GearBoxInfo
+{
+  SetBusContext(gBusContext_Comfort);
+  $Gateway_1::Gear = $GearBoxInfo::Gear;
+}
+
+
+
+GWStarter(long status)
+{
+  if(status && gActKeyPos == IGN_KL15)
+  {
+    gEngineIsRunning = status;
+
+    setBusContext(gBusContext_PowerTrain);
+    ILActivateClamp15();
+       
+    enableControl("Control", "Run", 0);
+    CancelTimer(tWheelSpin);
+    SetTimer(tWheelSpin,gWheelSpinTimerInterval);
+
+    $PowerTrain::Ignition_Info::StarterKey = status;
+    
+    SetBusContext(gBusContext_Comfort);
+    ILActivateClamp15();
+    $Comfort::Gateway_1::EngineRunning = status;
+    $Comfort::Gateway_1::StarterKey = status;
+  }
+}
+
+PutDspValueToControl (long val)
+{
+  switch(val)
+  {
+    case 1:
+            putValueToControl("Gateway","DisplayControl","This is the CANSystem Demo!");
+    break;
+
+    case 2:
+            putValueToControl("Gateway","DisplayControl",gMsgEngineData);
+    break;
+
+    case 3:
+            putValueToControl("Gateway","DisplayControl",gMsgEngineData.EngSpeed.phys);
+    break;
+  }
+}
+
+IgnitionStatus (long status)
+{
+  switch(status)
+  {
+    case IGN_OFF:   if (gActKeyPos != IGN_KL15R) {
+                      IgnitionStatus(IGN_KEY);
+                    }
+                    gActKeyPos = IGN_OFF;  
+                    break;
+    case IGN_KEY:                       
+                    if(gActKeyPos == IGN_KL15)
+                    {
+                      IgnitionStatus(IGN_KL15R);
+                    }
+                    SetBusContext(gBusContext_Comfort);
+                    $Comfort::Gateway_1::Ig_15R = 0;
+                    gActKeyPos = IGN_KEY;
+                    break;
+    case IGN_KL15R:
+                    if(gActKeyPos == IGN_OFF) {
+                      IgnitionStatus(IGN_KEY);
+                    } 
+                    else if(gActKeyPos == IGN_KL15)
+                    {
+                      SetBusContext(gBusContext_PowerTrain);
+                      $PowerTrain::Ignition_Info::StarterKey = 0;
+                      ILDeactivateClamp15();
+                      
+                      SetBusContext(gBusContext_Comfort);
+                      $Comfort::Gateway_1::Ig_15 = 0;
+                      $Comfort::Gateway_1::EngineRunning = 0;
+                      ILDeactivateClamp15();
+                    }      
+                    
+                    if(gActKeyPos == IGN_KEY)
+                    {
+                      SetBusContext(gBusContext_Comfort);
+                      //fs canOnline(3);
+                      $Comfort::Gateway_1::Ig_15R = 1;
+                    }
+
+                    gEngineIsRunning = 0;
+                    // Reset signals on comfort bus
+                    $Gateway_2::EngineTemp = 0;
+                    $Gateway_2::PetrolLevel = 0;
+                    $Gateway_2::EngSpeed = 0;
+                    $Gateway_2::CarSpeed = 0;
+
+                    cancelTimer(tWheelSpin);
+                    enableControl("Control", "Run", 0);
+  
+                    gActKeyPos = IGN_KL15R;
+                    SetBusContext(gBusContext_PowerTrain);
+                    NM_ReinitSleepTimer();
+                    SetBusContext(gBusContext_Comfort);          
+                    NM_ReinitSleepTimer();
+                    break;
+    case IGN_KL15:
+                    if(gActKeyPos != IGN_KL15R)
+                    {
+                      IgnitionStatus(IGN_KL15R);
+                    }
+                    SetBusContext(gBusContext_Comfort);
+                    $Comfort::Gateway_1::Ig_15 = 1;
+                    $Comfort::Gateway_1::StarterKey = 0;
+
+                    enableControl("Control", "Run", 1);
+                    gActKeyPos = IGN_KL15;
+                    break;
+  }    
+}
+
+void Nm_PrepareBusSleepModeInd()
+{ 
+  ILControlWait();
+}
+
+void Nm_NetworkModeInd()
+{
+  ILControlResume();
+}
+
+on sysvar_update sysvar::ComfortBus::GatewayStarter
+{
+  GWStarter(@sysvar::ComfortBus::GatewayStarter);
+}
+
+on sysvar_update sysvar::ComfortBus::GatewaySwitchIgnition
+{
+   IgnitionStatus(@sysvar::ComfortBus::GatewaySwitchIgnition);
+}
+
+on sysvar_update sysvar::ComfortBus::ShowMultiDisplay
+{
+  PutDspValueToControl(@sysvar::ComfortBus::ShowMultiDisplay);
+}
+
+on sysvar_update sysvar::NMTester::NMOnOff29
+{
+  setBusContext( gBusContext_Comfort);
+  if(@this) 
+  {
+    canOffline(3);
+    TraceNMState(getBusContext(),8);
+  }
+  else 
+  {
+    canOnline(3);
+    TraceNMState(getBusContext(), Nm_GetState());
+  }
+}
+
+on sysvar_update sysvar::NMTester::NMOnOff26_PT
+{
+  setBusContext( gBusContext_PowerTrain);
+  if(@this) 
+  {
+    canOffline(3);
+    TraceNMState(getBusContext(),8);
+  }
+  else 
+  {
+    canOnline(3);
+    TraceNMState(getBusContext(), Nm_GetState());
+  }
+}

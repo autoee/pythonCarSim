@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<Panel Type="Vector.CANalyzer.Panels.PanelSerializer, Vector.CANalyzer.Panels.Serializer, Version=7.6.68.0, Culture=neutral, PublicKeyToken=null">
+  <Object Type="Vector.CANalyzer.Panels.Runtime.Panel, Vector.CANalyzer.Panels.Common, Version=7.6.68.0, Culture=neutral, PublicKeyToken=null" Name="Panel1" Children="Controls" ControlName="Help">
+    <Object Type="Vector.CANalyzer.Panels.Design.GroupBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=7.6.68.0, Culture=neutral, PublicKeyToken=null" Name="GroupBoxControl2" Children="Controls" ControlName="GroupBoxControl2">
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=7.6.68.0, Culture=neutral, PublicKeyToken=null" Name="StaticTextControl1" Children="Controls" ControlName="StaticTextControl1">
+        <Property Name="Name">StaticTextControl1</Property>
+        <Property Name="Size">226, 56</Property>
+        <Property Name="Location">61, 23</Property>
+        <Property Name="BackColor">221, 221, 221</Property>
+        <Property Name="Text">Press the help button to get an overview of the demo configuration or go to 'Configuration comment...' in the 'File' menu. More detailed information is available in the online help.</Property>
+      </Object>
+      <Object Type="Vector.CANalyzer.Panels.Design.PanelHelpControl, Vector.CANalyzer.Panels.CommonControls, Version=7.6.68.0, Culture=neutral, PublicKeyToken=null" Name="PanelHelpControl1" Children="Controls" ControlName="PanelHelpControl1">
+        <Property Name="Name">PanelHelpControl1</Property>
+        <Property Name="Size">45, 42</Property>
+        <Property Name="Location">10, 23</Property>
+        <Property Name="Image">iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAShJREFUOE99k7FtwzAQRa/XCuxdpUkVZIMAmiO9Baj3AkZWEJBOgGqX6dJKlbKBBlAZ27nw0/7EWaRUEDTo++/+fYqiqpJbJ3l2fimWiGDtc3Wr4i/3ptffcwB8yhMh2F8sKAGgM8R/l4tipwvsH7KzIAfQAyAnthMS9i6OoCoC1jofDhJcEGQdhWzwz5ZtCACxAGYSR0ARAlvOnOtsAw2Asiy/rS37m/Z5BnFRFDoMQ8iAgJgsClhM20vxOI7adZ1WVXXTeQcg6TRN6twtXVyXdcLOELdtq3Vds6mLI/zsjwkI17UljiHeP9VQTNA8z9FR3/dJZ15LvB8PeSUIIxAEW03TPNje/JTxrROEEZBFDEz8weLxZR9TmM0XE3TfE3HyFtae9tb5P/79ONIh+qqxAAAAAElFTkSuQmCC</Property>
+        <Property Name="Filename">..\Control.txt</Property>
+        <Property Name="TabIndex">0</Property>
+      </Object>
+      <Property Name="Name">GroupBoxControl2</Property>
+      <Property Name="Size">305, 113</Property>
+      <Property Name="Location">11, 3</Property>
+      <Property Name="BackColor">221, 221, 221</Property>
+      <Property Name="Text">Demo Help</Property>
+      <Property Name="TabIndex">1</Property>
+    </Object>
+    <Property Name="Name">Panel1</Property>
+    <Property Name="Size">326, 126</Property>
+    <Property Name="BackColor">221, 221, 221</Property>
+  </Object>
+</Panel>
