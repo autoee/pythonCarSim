@@ -1,8 +1,7 @@
 
-includes
-{
+
   #include "..\CAPL Includes\NM_Observer_Include.cin"
-}
+
 variables
 {
   int gShowMultiDisplay;
@@ -37,8 +36,7 @@ variables
   const long SA_POWER_TRAIN = 26;
 }
 
-on start
-{   
+void onstart(){   
   SetBusContext(gBusContext_Comfort);
   
   // Send type: cyclic if active
@@ -49,12 +47,10 @@ on start
 
   //Create a new page at the write window
   gNewPage= writeCreate("Test Environment");
-  //display information for the test-setup
-  writeLineEx(gNewPage,1,"- Press <e> to start the engine node test");
+  //display informativoid onforthetest-setup()  writeLineEx(gNewPage,1,"- Press <e> to start the engine node test");
   writeLineEx(gNewPage,1,"- Use the interactive generator for sending a undefined message");
 
-  // set to 2 to get more information into write-window 
-  setWriteDbgLevel(1);
+  // set to 2 to get more informativoid onintowrite-window()  setWriteDbgLevel(1);
   writeDbgLevel(2,"Gateway");
 
   enableControl("Control", "Run", 0);
@@ -63,8 +59,7 @@ on start
   SetExtAddressingMode(); 
 }
 
-on message ABSdata
-{
+void onmessageABSdata(){
   double lastval;
 
   SetBusContext(gBusContext_Comfort);
@@ -75,8 +70,7 @@ on message ABSdata
   lastval = this.CarSpeed.phys;
 }
 
-on message EngineData
-{
+void onmessageEngineData(){
   double lastEngTemp;
   double lastPetrolLevel;
   double lastEngSpeed;
@@ -111,8 +105,7 @@ on message EngineData
   }
 }
 
-on timer tWheelSpin
-{
+void ontimertWheelSpin(){
   if(gWheelSpin < 16) 
   {
     @sysvar::ComfortBus::EngineRunningWheel = gWheelSpin;
@@ -166,8 +159,7 @@ ExchangeData (long rxCount,dword busContext, char busContextString[], dword send
 
   writeDbgLevel(2,"%s %s: received data : %X", gECU, busContextString, gTxDataBuffer[0] );
 }
-
-OSEKTL_DataCon(long status)
+void OSEKTL_DataCon(long status)
 {
   char busContextString[32];
   dword busContext;
@@ -200,8 +192,7 @@ OSEKTL_DataCon(long status)
     writeDbgLevel(1,"%s %s: tx error, status is %d", gECU, busContextString, status);   
   } 
 }
-
-OSEKTL_DataInd( long rxCount )
+void OSEKTL_DataInd( long rxCount )
 {
   dword receiveContext;
   dword transmitContext;
@@ -219,12 +210,10 @@ OSEKTL_DataInd( long rxCount )
     strncpy(busContextString,  gPowerTrain, 32);
     transmitContext = gBusContext_Comfort;
   }
-  writeDbgLevel(2,"%s %s : data indication called, RxCount = %d,", gECU, busContextString, rxCount);
-
+  writeDbgLevel(2,"%s %s : data indicativoid oncalled,RxCount=%d,",gECU,busContextString,rxCount);()
   ExchangeData(rxCount, receiveContext, busContextString, transmitContext);
 }
-
-OSEKTL_ErrorInd(int error)
+void OSEKTL_ErrorInd(int error)
 {
   char busContextString[32];
   dword busContext;
@@ -289,8 +278,7 @@ SetExtAddressingMode ()
   }
 }
 
-on preStart
-{
+void onpreStart(){
   if (0 == gBusContext_Comfort)
   {
     writeex( 0, 3, "Error: Cannot determine context for bus: %s", gComfort);
@@ -303,8 +291,7 @@ on preStart
   
   if( GetBusContext() == gBusContext_Comfort)
   { 
-    // Nm_CtrlSimulationOff(); // Disable ASR NM on Comfort
-     Nm_SetAutoStartParam(0);
+    // Nm_CtrlSimulationOff(); // Disable ASR NM void onComfort()     Nm_SetAutoStartParam(0);
      ILSetAutoStartParam(0);
   } 
   else if( GetBusContext() == gBusContext_PowerTrain)
@@ -319,23 +306,19 @@ CallbackInfo (char apName[])
 {
   if( GetBusContext() == gBusContext_Comfort)
   { 
-    writeDbgLevel(2,"%s is called on Comfort", apName);
-  } 
+    writeDbgLevel(2,"%s is called void onComfort",apName);()  } 
   else if( GetBusContext() == gBusContext_PowerTrain)
   {
-    writeDbgLevel(2,"%s is called on PowerTrain", apName);
-  }
+    writeDbgLevel(2,"%s is called void onPowerTrain",apName);()  }
 }
 
-on message GearBoxInfo
-{
+void onmessageGearBoxInfo(){
   SetBusContext(gBusContext_Comfort);
   $Gateway_1::Gear = $GearBoxInfo::Gear;
 }
 
 
-
-GWStarter(long status)
+void GWStarter(long status)
 {
   if(status && gActKeyPos == IGN_KL15)
   {
@@ -417,8 +400,7 @@ IgnitionStatus (long status)
                     }
 
                     gEngineIsRunning = 0;
-                    // Reset signals on comfort bus
-                    $Gateway_2::EngineTemp = 0;
+                    // Reset signals void oncomfortbus()                    $Gateway_2::EngineTemp = 0;
                     $Gateway_2::PetrolLevel = 0;
                     $Gateway_2::EngSpeed = 0;
                     $Gateway_2::CarSpeed = 0;
@@ -457,23 +439,19 @@ void Nm_NetworkModeInd()
   ILControlResume();
 }
 
-on sysvar_update sysvar::ComfortBus::GatewayStarter
-{
+void onsysvar_updatesysvar::ComfortBus::GatewayStarter(){
   GWStarter(@sysvar::ComfortBus::GatewayStarter);
 }
 
-on sysvar_update sysvar::ComfortBus::GatewaySwitchIgnition
-{
+void onsysvar_updatesysvar::ComfortBus::GatewaySwitchIgnition(){
    IgnitionStatus(@sysvar::ComfortBus::GatewaySwitchIgnition);
 }
 
-on sysvar_update sysvar::ComfortBus::ShowMultiDisplay
-{
+void onsysvar_updatesysvar::ComfortBus::ShowMultiDisplay(){
   PutDspValueToControl(@sysvar::ComfortBus::ShowMultiDisplay);
 }
 
-on sysvar_update sysvar::NMTester::NMOnOff29
-{
+void onsysvar_updatesysvar::NMTester::NMOnOff29(){
   setBusContext( gBusContext_Comfort);
   if(@this) 
   {
@@ -487,8 +465,7 @@ on sysvar_update sysvar::NMTester::NMOnOff29
   }
 }
 
-on sysvar_update sysvar::NMTester::NMOnOff26_PT
-{
+void onsysvar_updatesysvar::NMTester::NMOnOff26_PT(){
   setBusContext( gBusContext_PowerTrain);
   if(@this) 
   {

@@ -1,10 +1,8 @@
 
-includes
-{
+
   #include "..\CAPL Includes\NM_Observer_Include.cin"
-}
-variables
-{
+
+
   char gECU[10] = "%NODE_NAME%";
 
   const int gTxSize = 4096;
@@ -22,40 +20,33 @@ variables
 
   msTimer tResetRadio;
   int     tResetRadioTime = 1;
-}
 
-on start
-{
+
+void onstart(){
   // net-management
-  // set to 2 to get more information into write-window 
-  setWriteDbgLevel(1);
+  // set to 2 to get more informativoid onintowrite-window()  setWriteDbgLevel(1);
   writeDbgLevel(2,gECU);
  
   // Init OSEK TP
   OSEKTL_SetExtMode();
 }
-
-OSEKTL_DataCon(long status)
+void OSEKTL_DataCon(long status)
 {
   writeDbgLevel(2,"%NODE_NAME%: tx error, status is %d  (Network '%NETWORK_NAME%', Channel %CHANNEL%)", status);  
 }
-
-OSEKTL_DataInd(long rxCount)
+void OSEKTL_DataInd(long rxCount)
 {
   int i;
 
   // Print message to write window 
-  writeDbgLevel(2,"%NODE_NAME%: data indication called, RxCount = %d  (Network '%NETWORK_NAME%', Channel %CHANNEL%)", rxCount);
-  
+  writeDbgLevel(2,"%NODE_NAME%: data indicativoid oncalled,RxCount=%d(Network'%NETWORK_NAME%',Channel%CHANNEL%)",rxCount);()  
   // Get received data 
   OSEKTL_GetRxData( gRxDataBuffer, elcount(gRxDataBuffer) );
   SysSetVariableData(sysvar::ComfortBus::TPConsoleMessage, gRxDataBuffer, rxCount);
 }
-
-OSEKTL_ErrorInd(int error)
+void OSEKTL_ErrorInd(int error)
 {
-  writeDbgLevel(1,"%NODE_NAME%: error indication error number= %d  (Network '%NETWORK_NAME%', Channel %CHANNEL%)", error);
-}
+  writeDbgLevel(1,"%NODE_NAME%: error indicativoid onerrornumber=%d(Network'%NETWORK_NAME%',Channel%CHANNEL%)",error);()}
 
 SendTPMessage ()
 {
@@ -73,19 +64,16 @@ SendTPMessage ()
   OSEKTL_DataReq(gTxDataBuffer, size);
 }
 
-on timer tPhase
-{
+void ontimertPhase(){
   gPhaseOn = !gPhaseOn;
 
   $%NODE_NAME%_2::Phase = gPhaseOn;
 
   setTimer(this,cPhaseTime);
 }
-
-SetRadioChannel(int channel)
+void SetRadioChannel(int channel)
 {
-  // Set the radio station text for the TP transmition  
-
+  // Set the radio stativoid ontextfortheTPtransmition()
   int i, StringLength;
   int MaxLength = 16;
 
@@ -133,8 +121,7 @@ SetRadioChannel(int channel)
   SysSetVariableData(sysvar::ComfortBus::TPConsoleMessage, Buffer, StringLength);
 }
 
-on timer tResetRadio
-{
+void ontimertResetRadio(){
   @sysvar::ComfortBus::SetRadioChannel_1 = 0;
   @sysvar::ComfortBus::SetRadioChannel_2 = 0;    
   @sysvar::ComfortBus::SetRadioChannel_3 = 0;
@@ -143,8 +130,7 @@ on timer tResetRadio
   SysSetVariableString(sysvar::ComfortBus::RadioInfoDisplay, "");
 }
 
-on preStart
-{
+void onpreStart(){
   @sysvar::ComfortBus::SetRadioChannel_1 = 0;
   @sysvar::ComfortBus::SetRadioChannel_2 = 0;    
   @sysvar::ComfortBus::SetRadioChannel_3 = 0;
@@ -153,8 +139,7 @@ on preStart
   SysSetVariableString(sysvar::ComfortBus::RadioInfoDisplay, "");
 }
 
-on sysvar_update sysvar::LightSystem::TurnIndicationLeft
-{
+void onsysvar_updatesysvar::LightSystem::TurnIndicationLeft(){
   if(@this == 1)
   {
     gTurnIndicatorLastStatus = %NODE_NAME%_2.Active::Turn_left;
@@ -174,8 +159,7 @@ on sysvar_update sysvar::LightSystem::TurnIndicationLeft
   }
 }
 
-on sysvar_update sysvar::LightSystem::TurnIndicationRight
-{
+void onsysvar_updatesysvar::LightSystem::TurnIndicationRight(){
   if(@this == 1)
   {
     gTurnIndicatorLastStatus = %NODE_NAME%_2.Active::Turn_right;
@@ -195,8 +179,7 @@ on sysvar_update sysvar::LightSystem::TurnIndicationRight
   }
 }
 
-on sysvar_update sysvar::LightSystem::SwitchHazard
-{
+void onsysvar_updatesysvar::LightSystem::SwitchHazard(){
   gWarningOn = !gWarningOn;
  
   if(gWarningOn)
@@ -215,8 +198,7 @@ on sysvar_update sysvar::LightSystem::SwitchHazard
   }
 }
 
-on sysvar_update sysvar::ComfortBus::RadioOnOff
-{
+void onsysvar_updatesysvar::ComfortBus::RadioOnOff(){
   if(@this == 1) @sysvar::ComfortBus::SetRadioChannel_1 = 1;
   else 
   {
@@ -229,8 +211,7 @@ on sysvar_update sysvar::ComfortBus::RadioOnOff
   }
 }
 
-on sysvar_update sysvar::ComfortBus::SetRadioChannel_1
-{
+void onsysvar_updatesysvar::ComfortBus::SetRadioChannel_1(){
   if(@this == 1 && @sysvar::ComfortBus::RadioOnOff == 1)
   {
     @sysvar::ComfortBus::SetRadioChannel_2 = 0;
@@ -246,8 +227,7 @@ on sysvar_update sysvar::ComfortBus::SetRadioChannel_1
   }
 }
 
-on sysvar_update sysvar::ComfortBus::SetRadioChannel_2
-{
+void onsysvar_updatesysvar::ComfortBus::SetRadioChannel_2(){
   if(@this == 1 && @sysvar::ComfortBus::RadioOnOff == 1)
   {
     @sysvar::ComfortBus::SetRadioChannel_1 = 0;
@@ -263,8 +243,7 @@ on sysvar_update sysvar::ComfortBus::SetRadioChannel_2
   }
 }
 
-on sysvar_update sysvar::ComfortBus::SetRadioChannel_3
-{
+void onsysvar_updatesysvar::ComfortBus::SetRadioChannel_3(){
   if(@this == 1 && @sysvar::ComfortBus::RadioOnOff == 1)
   {
     @sysvar::ComfortBus::SetRadioChannel_1 = 0;
@@ -280,8 +259,7 @@ on sysvar_update sysvar::ComfortBus::SetRadioChannel_3
   }
 }
 
-on sysvar_update sysvar::ComfortBus::SetRadioChannel_4
-{
+void onsysvar_updatesysvar::ComfortBus::SetRadioChannel_4(){
   if(@this == 1 && @sysvar::ComfortBus::RadioOnOff == 1)
   {
     @sysvar::ComfortBus::SetRadioChannel_1 = 0;
@@ -297,14 +275,12 @@ on sysvar_update sysvar::ComfortBus::SetRadioChannel_4
   }
 }
 
-on sysvar_update sysvar::ComfortBus::TPConsoleMessage
-{
+void onsysvar_updatesysvar::ComfortBus::TPConsoleMessage(){
   Nm_NetworkRequest();
   SendTPMessage();
 }
 
-on sysvar_update sysvar::NMTester::NMOnOff26
-{
+void onsysvar_updatesysvar::NMTester::NMOnOff26(){
   if(@this) 
   {
     canOffline(3); 

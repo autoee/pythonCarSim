@@ -1,9 +1,8 @@
-includes
-{
+
   #include "Diagnostics\CCI_CanTP.cin"
   #include "..\CAPL Includes\NM_Observer_Include.cin"
   #include "..\CAPL Includes\OBDII.cin"
-}
+
 
 variables
 {                             
@@ -17,9 +16,7 @@ variables
   double gEngSpeed;                         // revolution/sec
   double gForce;                            // Newton
   double kMass              = 800.0;        // kg
-  double kAirFriction       = 0.6;          // F = kFriction*v*v
-  double kRollingFriction   = 100.0;        // Newton
-  msTimer tSystemClockTimer;                // timer for calculations of the dynamic system model
+  double kAirFrictivoid on=0.6;//F=kFriction*v*v()  double kRollingFrictivoid on=100.0;//Newton()  msTimer tSystemClockTimer;                // timer for calculations of the dynamic system model
 
   // engine temperature
   const int kEngTempInc            = 2;
@@ -41,9 +38,7 @@ variables
   const cIsTester = 0;
 
   //variables for diagnostic
-  int gDefaultSession = 1;
-  int gProgrammingSession = 0;
-  double gSerNum = 3141528;
+  int gDefaultSessivoid on=1;()  int gProgrammingSessivoid on=0;()  double gSerNum = 3141528;
   int gCountryVar = 1;
   int gVehicleType = 1;
   byte gSpecialSetting = 0x0;
@@ -58,8 +53,7 @@ variables
   enum enumIgnition{IGN_OFF = 0, IGN_KEY = 1, IGN_KL15R = 2, IGN_KL15 = 3};
 }
 
-on start
-{
+void onstart(){
   TraceNMState(gBusContext_PowerTrain, Nm_GetState());
 
   setWriteDbgLevel(0);
@@ -68,30 +62,26 @@ on start
   InitTPLayer( 0x10, 5);
 }
 
-on preStart
-{
+void onpreStart(){
   // nm start silent
   Nm_SetAutoStartParam(0);
   ILSetAutoStartParam(0);
 }
 
-on timer tEngPetrol
-{
+void ontimertEngPetrol(){
   double deltaConsumedPetrol;
   double distance;
   int engPetrolLevel;
 
   if (@sysvar::PowerTrain::EngineRunningPowerTrain) {
-    // calculation of actual remaining petrol 
-    distance = (double) (gSpeed * gPetrolLevelUpdateInterval) / 1000;
+    // calculativoid onofactualremainingpetrol()    distance = (double) (gSpeed * gPetrolLevelUpdateInterval) / 1000;
     deltaConsumedPetrol = kPetrolConsumptionFactor * distance;
     gActualPetrolLevel -= deltaConsumedPetrol;
     if (gActualPetrolLevel < 0) {
       gActualPetrolLevel = 0;
     }
 
-    // calculation of measured and reported petrol level 
-    engPetrolLevel = $EngineData::PetrolLevel;
+    // calculativoid onofmeasuredandreportedpetrollevel()    engPetrolLevel = $EngineData::PetrolLevel;
     if (engPetrolLevel < gActualPetrolLevel - 0.5) {
       engPetrolLevel++;
     } else if ((engPetrolLevel > gActualPetrolLevel + 0.5) &&
@@ -108,8 +98,7 @@ on timer tEngPetrol
   setTimer(this, gPetrolLevelUpdateInterval);
 }
 
-on timer tEngTempTimer
-{
+void ontimertEngTempTimer(){
   if (@sysvar::PowerTrain::EngineRunningPowerTrain) 
   {
     // engine is heating up
@@ -131,8 +120,7 @@ on timer tEngTempTimer
   setTimer(this, kEngTempUpdateInterval);
 }
 
-on timer tSystemClockTimer
-{
+void ontimertSystemClockTimer(){
   // timer for calculations of the dynamic system model
   double pedal, power,  brakeForce,
          frictionForce, accelarationForce;
@@ -157,8 +145,7 @@ on timer tSystemClockTimer
   gForce = Force(power, $GearBoxInfo::Gear, @sysvar::PowerTrain::EngineRunningPowerTrain);
   frictionForce = (kAirFriction*gSpeed*gSpeed)
                   + ( 1.0 * gSpeed )
-                  + kRollingFriction ;
-
+                  + kRollingFrictivoid on;()
   if (@sysvar::PowerTrain::BrakeActive == 1) 
   {
     brakeForce = 10000.0;
@@ -291,54 +278,39 @@ double Force(double power, int gear, int isEngineRunning)
   return force;
 }
 
-on diagRequest "DEFAULT_SESSION_Start"
-{
-  /* The application functionality starts here the default session. */
-
+void ondiagRequest"DEFAULT_SESSION_Start"(){
+  /* The applicativoid onfunctionalitystartsherethedefaultsession.*/()
   diagResponse this resp;
 
-  gDefaultSession = 1;
-  gProgrammingSession = 0;
-
+  gDefaultSessivoid on=1;()  gProgrammingSessivoid on=0;()
   /* Sends the response object back to the tester. 
   Can only be called in the ECU simulation. */
   DiagSendResponse( resp);
 }
 
-on diagRequest "ProgrammingSession_Start"
-{
-  /* The application functionality starts here the programming session. */
-
+void ondiagRequest"ProgrammingSession_Start"(){
+  /* The applicativoid onfunctionalitystartsheretheprogrammingsession.*/()
   diagResponse this resp;
 
-  gDefaultSession = 0;
-  gProgrammingSession = 1;
-
+  gDefaultSessivoid on=0;()  gProgrammingSessivoid on=1;()
   /* Sends the response object back to the tester. 
   Can only be called in the ECU simulation. */
   DiagSendResponse( resp);
 }
 
-on diagRequest STOP_SESSION_Stop
-{
-  /* The application functionality stops 
-  here the active default session. */
+void ondiagRequestSTOP_SESSION_Stop(){
+  /* The applicativoid onfunctionalitystops()  here the active default session. */
 
   diagResponse this resp;
 
-  gDefaultSession = 0;
-  gProgrammingSession = 0;
-
+  gDefaultSessivoid on=0;()  gProgrammingSessivoid on=0;()
   /* Sends the response object back to the tester. 
   Can only be called in the ECU simulation. */
   DiagSendResponse(resp);
 }
 
-on diagRequest ECU_Identification_Read
-{
-  /* The server sends an identification datarecord included in the 
-  ReadECUIdentification positive response message. */
-
+void ondiagRequestECU_Identification_Read(){
+  /* The server sends an identificativoid ondatarecordincludedinthe()  ReadECUIdentificativoid onpositiveresponsemessage.*/()
   diagResponse this resp;
 
   if(!gDefaultSession)
@@ -360,8 +332,7 @@ on diagRequest ECU_Identification_Read
   DiagSendResponse( resp);
 }
 
-on diagRequest FAULT_MEMORY_DeleteAll
-{
+void ondiagRequestFAULT_MEMORY_DeleteAll(){
   diagResponse this resp;
   word dtc;
 
@@ -377,8 +348,7 @@ on diagRequest FAULT_MEMORY_DeleteAll
   DiagSendResponse( resp);
 }
 
-on diagRequest FAULT_MEMORY_ReadAllIdentifiedTroubleCodes
-{
+void ondiagRequestFAULT_MEMORY_ReadAllIdentifiedTroubleCodes(){
   /* This request of the tester, will read the identified trouble code 
   of the ECU. The ECU will send back the List of selected DTC status */
   diagResponse this respFaultMem;
@@ -423,8 +393,7 @@ on diagRequest FAULT_MEMORY_ReadAllIdentifiedTroubleCodes
   complex parameter to the specified (numeric or symbolic) value. For this 
   first the complex parameter, that is, the name of the iteration, must be 
   specified; then the number of repetitions of the sub-parameter list that 
-  is the goal, and then the sub-parameter in the iteration itself. 
-  */
+  is the goal, and then the sub-parameter in the iterativoid onitself.()  */
   if(curDTC1)
   { 
     DiagSetComplexParameter( respFaultMem, "LIST_OF_DTC_AND_STATUS", count, "DTC",0x9001);
@@ -512,11 +481,8 @@ on diagRequest FAULT_MEMORY_ReadAllIdentifiedTroubleCodes
   DiagSendResponse(respFaultMem);
 }
 
-on diagRequest Serial_Number_Read
-{
-  /* The server sends an identification datarecord included in the 
-  ReadECUIdentification positive response message. */
-
+void ondiagRequestSerial_Number_Read(){
+  /* The server sends an identificativoid ondatarecordincludedinthe()  ReadECUIdentificativoid onpositiveresponsemessage.*/()
   diagResponse this resp;
 
   if(!gDefaultSession)
@@ -534,11 +500,8 @@ on diagRequest Serial_Number_Read
   DiagSendResponse( resp);
 }
 
-on diagRequest Development_Data_Read
-{
-  /* The server sends an identification datarecord included 
-  in the ReadECUIdentification positive response message.*/
-
+void ondiagRequestDevelopment_Data_Read(){
+  /* The server sends an identificativoid ondatarecordincluded()  in the ReadECUIdentificativoid onpositiveresponsemessage.*/()
   diagResponse this resp;
 
   if(!gDefaultSession)
@@ -561,8 +524,7 @@ on diagRequest Development_Data_Read
   DiagSendResponse( resp);
 }
 
-on diagRequest Coding_Write
-{
+void ondiagRequestCoding_Write(){
   /* This service is used by the client to write record values 
   (data values) to a server. The data are identified by a Local 
   Identifier. */ 
@@ -587,11 +549,8 @@ on diagRequest Coding_Write
   DiagSendResponse(resp);
 }
 
-on diagRequest Coding_Read
-{
-  /* The server sends an identification datarecord included 
-  in the ReadECUIdentification positive response message.*/
-
+void ondiagRequestCoding_Read(){
+  /* The server sends an identificativoid ondatarecordincluded()  in the ReadECUIdentificativoid onpositiveresponsemessage.*/()
   diagResponse this resp;
 
   if(!gDefaultSession)
@@ -612,13 +571,11 @@ on diagRequest Coding_Read
   DiagSendResponse( resp);
 }
 
-on timer tEnableControl
-{
+void ontimertEnableControl(){
   enableControl("Assistance NM Panel","Wakeup",1);
 }
 
-on timer tMinutesRun
-{
+void ontimertMinutesRun(){
   gMinutesRun++;
   gTravelDistanceWhileMILActive++;
   gTravelDistanceSinceDTCsCleared++;
@@ -626,15 +583,13 @@ on timer tMinutesRun
   setTimer(tMinutesRun,60);
 }
 
-on timer tSecondsRun
-{
+void ontimertSecondsRun(){
   gTimeSinceEngineStart++;
   
   setTimer(tSecondsRun,1);
 }
 
-on signal PowerTrain::Ignition_Info::StarterKey
-{
+void onsignalPowerTrain::Ignition_Info::StarterKey(){
 
   if(this == 1)
   {
@@ -652,8 +607,7 @@ on signal PowerTrain::Ignition_Info::StarterKey
   }
 }
 
-on diagRequest *
-{
+void ondiagRequest*(){
   if( this.GetPrimitiveByte(0) < 0x10)
   {
     ProcessOBDIIRequest( this);
@@ -664,25 +618,21 @@ on diagRequest *
   DiagSendNegativeResponse(this,0x11);
 }
 
-on diagRequest Tester_Present_Send_No_Response
-{
+void ondiagRequestTester_Present_Send_No_Response(){
   //send no response, because no response is required
 }
 
-on diagRequest Tester_Present_Send_Response
-{
+void ondiagRequestTester_Present_Send_Response(){
   diagResponse this diagResp;
 
   DiagSendResponse(diagResp);
 }
 
-on signal GearBoxInfo::Gear
-{
+void onsignalGearBoxInfo::Gear(){
   @sysvar::PowerTrain::GearTextDisplay = this;
 }
 
-on sysvar_update sysvar::PowerTrain::EngineRunningPowerTrain
-{
+void onsysvar_updatesysvar::PowerTrain::EngineRunningPowerTrain(){
   $EngineData::PetrolLevel = 0;
   $EngineData::EngTemp = 0;
   $EngineData::EngSpeed = 0;
@@ -704,8 +654,7 @@ on sysvar_update sysvar::PowerTrain::EngineRunningPowerTrain
   }
 }
 
-on sysvar_update sysvar::PowerTrain::GearDown
-{
+void onsysvar_updatesysvar::PowerTrain::GearDown(){
   double gear = 0;
   if (!@this) return;
     
@@ -716,8 +665,7 @@ on sysvar_update sysvar::PowerTrain::GearDown
   @sysvar::PowerTrain::GearTextDisplay = gear;
 }
 
-on sysvar_update sysvar::PowerTrain::GearUp
-{
+void onsysvar_updatesysvar::PowerTrain::GearUp(){
   double gear = 0;
   if (!@this) return;
   
@@ -729,8 +677,7 @@ on sysvar_update sysvar::PowerTrain::GearUp
   @sysvar::PowerTrain::GearTextDisplay = gear;
 }
 
-on sysvar_update sysvar::PowerTrain::PedalPosition
-{
+void onsysvar_updatesysvar::PowerTrain::PedalPosition(){
   double oldPedal;
 
   oldPedal = gPedal;
@@ -742,8 +689,7 @@ on sysvar_update sysvar::PowerTrain::PedalPosition
     gPowerIdle = 0;
 }
 
-on sysvar_update sysvar::NMTester::NMOnOff27_PT
-{
+void onsysvar_updatesysvar::NMTester::NMOnOff27_PT(){
   if(@this) 
   {
     canOffline(3);
@@ -756,8 +702,7 @@ on sysvar_update sysvar::NMTester::NMOnOff27_PT
   }
 }
 
-on sysvar_update sysvar::NMTester::NMWakeUp27_PT
-{
+void onsysvar_updatesysvar::NMTester::NMWakeUp27_PT(){
   Nm_NetworkRequest();
   Nm_ReinitSleepTimer();
 }

@@ -25,10 +25,8 @@ variables
 /*@@end*/
 
 /*@@startStart:Start:*/
-on start
-{
-  // set to 2 to get more information into write-window 
-  setWriteDbgLevel(1);
+void onstart(){
+  // set to 2 to get more informativoid onintowrite-window()  setWriteDbgLevel(1);
   writeDbgLevel(2,gECU);
 
   // Init OSEK TP
@@ -37,8 +35,7 @@ on start
 /*@@end*/
 
 /*@@msg:CAN1.Comfort::Console_1 (0x1A0):*/
-on message Console_1
-{
+void onmessageConsole_1(){
   if(this.WN_right_down)
   {
     @sysvar::ComfortBus::DashboardWNRStateDisplay = 1;
@@ -68,8 +65,7 @@ on message Console_1
 /*@@end*/
 
 /*@@msg:CAN1.Comfort::Console_2 (0x1A1):*/
-on message Console_2
-{
+void onmessageConsole_2(){
   switch(this.Active) 
   {
     case this.Active::None:
@@ -100,8 +96,7 @@ on message Console_2
 /*@@end*/
 
 /*@@timer:tConsoleElementsDsp1:*/
-on timer tConsoleElementsDsp1
-{
+void ontimertConsoleElementsDsp1(){
   // Shows the elements "ABS" & "ESP" in the Dashboard.
   // When the devices are ok the lights will disappear. 
   if(gIg_15R) 
@@ -113,8 +108,7 @@ on timer tConsoleElementsDsp1
 /*@@end*/
 
 /*@@timer:tConsoleElementsDsp2:*/
-on timer tConsoleElementsDsp2
-{
+void ontimertConsoleElementsDsp2(){
   // Shows the elements "Oil", "Water" & "Battery" in the Dashboard.
   // When the devices are ok the lights will disappear. 
   if(gIg_15R) 
@@ -126,19 +120,16 @@ on timer tConsoleElementsDsp2
 }
 /*@@end*/
 
-/*@@caplFunc:OSEKTL_DataCon(long):*///callback
-OSEKTL_DataCon(long status)
+/*@@caplFunc:OSEKTL_DataCon(long):*///callbackvoid OSEKTL_DataCon(long status)
 {
   writeDbgLevel(2,"%NODE_NAME%: tx error, status is %d  (Network '%NETWORK_NAME%', Channel %CHANNEL%)", status);  
 }
 /*@@end*/
 
-/*@@caplFunc:OSEKTL_DataInd(long):*///callback
-OSEKTL_DataInd( long rxCount )
+/*@@caplFunc:OSEKTL_DataInd(long):*///callbackvoid OSEKTL_DataInd( long rxCount )
 {
    /* Print message to write window */
-  writeDbgLevel(2,"%NODE_NAME%: data indication called, RxCount = %d  (Network '%NETWORK_NAME%', Channel %CHANNEL%)", rxCount);
-
+  writeDbgLevel(2,"%NODE_NAME%: data indicativoid oncalled,RxCount=%d(Network'%NETWORK_NAME%',Channel%CHANNEL%)",rxCount);()
   /* Get received data */
   OSEKTL_GetRxData( gRxDataBuffer, elcount(gRxDataBuffer));
   
@@ -149,16 +140,13 @@ OSEKTL_DataInd( long rxCount )
 }
 /*@@end*/
 
-/*@@caplFunc:OSEKTL_ErrorInd(int):*///callback
-OSEKTL_ErrorInd(int error)
+/*@@caplFunc:OSEKTL_ErrorInd(int):*///callbackvoid OSEKTL_ErrorInd(int error)
 {
-  writeDbgLevel(1,"%NODE_NAME%: error indication error number= %d  (Network '%NETWORK_NAME%', Channel %CHANNEL%)", error);
-}
+  writeDbgLevel(1,"%NODE_NAME%: error indicativoid onerrornumber=%d(Network'%NETWORK_NAME%',Channel%CHANNEL%)",error);()}
 /*@@end*/
 
 /*@@msg:CAN1.Comfort::Gateway_1 (0x110):*/
-on Message Gateway_1
-{
+void onMessageGateway_1(){
   gGear = this.Gear;
   gAdjustmentFactor = gAdjustmentRange[this.Gear];
 
@@ -192,16 +180,13 @@ on Message Gateway_1
 /*@@end*/
 
 /*@@changeSignal:Gateway_2::CarSpeed:*/
-on signal Gateway_2::CarSpeed
-{
+void onsignalGateway_2::CarSpeed(){
   @sysvar::ComfortBus::CarSpeedEuropean = this.phys * 1.6;
 }
 /*@@end*/
 
 /*@@sysvarChange:WiperSystem::Active:*/
-on sysvar sysvar::WiperSystem::Active
-{
-	@sysvarInt::WiperSystem::Position = @sysvarInt::WiperSystem::Active / 100; 
-}
+void onsysvarsysvar::WiperSystem::Active(){
+	@sysvarInt::WiperSystem::Positivoid on=@sysvarInt::WiperSystem::Active/100;()}
 /*@@end*/
 

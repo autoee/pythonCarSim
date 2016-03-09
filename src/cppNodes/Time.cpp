@@ -1,36 +1,30 @@
 /*@@var:*/
-variables
-{
-}
+
+
 /*@@end*/
 
 /*@@startStart:Start:*/
-on start
-{
+void onstart(){
   dword mNewPage; // Sink identifier 
 
-  //Create a Instruction page at the write window
-  mNewPage= writeCreate("Logging Instruction");
+  //Create a Instructivoid onpageatthewritewindow()  mNewPage= writeCreate("Logging Instruction");
 
   //Clear content of CAPL page
   writeclear(1);
 
-  //Show the description of the program
-  writeLineEx(mNewPage,1,"Press <1> to start/stop Comfort logging");
+  //Show the descriptivoid onoftheprogram()  writeLineEx(mNewPage,1,"Press <1> to start/stop Comfort logging");
   writeLineEx(mNewPage,1,"Press <2> to start/stop PowerTrain logging");
 }
 /*@@end*/
 
 /*@@msg:*:*/
-on message *
-{
+void onmessage*(){
   output(this); 
 }
 /*@@end*/
 
 /*@@key:'1':*/
-on key '1'
-{
+void onkey'1'(){
   int flag;
 
   if(flag==0)
@@ -51,8 +45,7 @@ on key '1'
 /*@@end*/
 
 /*@@key:'2':*/
-on key '2'
-{
+void onkey'2'(){
   int flag;
 
   if(flag==0)

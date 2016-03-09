@@ -1,38 +1,30 @@
-includes
-{
+
   /* You can source out constants, variables and functions 
      that are needed identically in multiple CAPL programs.*/
-  #include "Diagnostics/CCI_CanTP.cin"   // Diagnostics CCI for ISO TP on CAN
-  #include "..\CAPL Includes\NM_Observer_Include.cin"   
+  #include "Diagnostics/CCI_CanTP.cin"   // Diagnostics CCI for ISO TP void onCAN()  #include "..\CAPL Includes\NM_Observer_Include.cin"   
   #include "..\CAPL Includes\DoorInclFile.cin"
-}
 
-variables
-{
+
+
   //variables for diagnostic
   char gECU[15] = "%NODE_NAME%";
   const cIsTester = 0;
   double gSerNum = 12584075;
   int gFaultMemClear = 0;
-  int gDefaultSession = 1;
-  int gProgrammingSession = 0;
-  int gCountryVar = 1;
+  int gDefaultSessivoid on=1;()  int gProgrammingSessivoid on=0;()  int gCountryVar = 1;
   int gVehicleType = 1;
   byte gSpecialSetting = 0x0;
 
-}
 
-on start
-{
-  // set to 2 to get more information into write-window 
-  setWriteDbgLevel(1);
+
+void onstart(){
+  // set to 2 to get more informativoid onintowrite-window()  setWriteDbgLevel(1);
   writeDbgLevel(2,gECU);
 
   SetMoveTimer();
 }
 
-on timer tMoveDownTimer
-{
+void ontimertMoveDownTimer(){
   if(gPosWN > 15 || gPosWN < 0 ) runError(1003,1003);
 
   if(gPosWN < 15 && gMoveDown == gTrue)
@@ -44,8 +36,7 @@ on timer tMoveDownTimer
   setTimer(this,cMoveTime);
 }
 
-on timer tMoveUpTimer
-{
+void ontimertMoveUpTimer(){
   if(gPosWN > 15 || gPosWN < 0) runError(1004,1004);
   
   if(gPosWN > 0 && gMoveUp == gTrue) 
@@ -57,8 +48,7 @@ on timer tMoveUpTimer
   setTimer(this,cMoveTime);
 }
 
-on Message Console_1
-{
+void onMessageConsole_1(){
   if(this.WN_left_up)
   {
     gMoveUp = gTrue;
@@ -75,27 +65,23 @@ on Message Console_1
   else gMoveDown = gFalse;
 }
 
-on diagRequest *
-{
+void ondiagRequest*(){
   //Diagnostic Request not supported
   DiagSendNegativeResponse(this,0x11);
 }
 
 
 
-on preStart
-{
+void onpreStart(){
   //fs canOffline(3);
 }
 
-on message Gateway_1
-{
+void onmessageGateway_1(){
    if(this.Ig_15  == 1)  canOnline(3);
    if(this.Ig_15R == 1)  canOnline(3);
 }
 
-on diagRequest FAULT_MEMORY_DeleteAll
-{
+void ondiagRequestFAULT_MEMORY_DeleteAll(){
   diagResponse this resp;
   word dtc;
 
@@ -111,18 +97,14 @@ on diagRequest FAULT_MEMORY_DeleteAll
   DiagSendResponse( resp);
 }
 
-on diagRequest Tester_Present_Send_Response
-{
+void ondiagRequestTester_Present_Send_Response(){
   diagResponse this diagResp;
 
   DiagSendResponse(diagResp);
 }
 
-on diagRequest Development_Data_Read
-{
-  /* The server sends an identification datarecord included 
-  in the ReadECUIdentification positive response message.*/
-
+void ondiagRequestDevelopment_Data_Read(){
+  /* The server sends an identificativoid ondatarecordincluded()  in the ReadECUIdentificativoid onpositiveresponsemessage.*/()
   diagResponse this resp;
 
   if(!gDefaultSession)
@@ -145,11 +127,8 @@ on diagRequest Development_Data_Read
   DiagSendResponse( resp);
 }
 
-on diagRequest ECU_Identification_Read
-{
-  /* The server sends an identification datarecord included in the 
-  ReadECUIdentification positive response message. */
-
+void ondiagRequestECU_Identification_Read(){
+  /* The server sends an identificativoid ondatarecordincludedinthe()  ReadECUIdentificativoid onpositiveresponsemessage.*/()
   diagResponse this resp;
 
   if(!gDefaultSession)
@@ -171,11 +150,8 @@ on diagRequest ECU_Identification_Read
   DiagSendResponse( resp);
 }
 
-on diagRequest Serial_Number_Read
-{
-  /* The server sends an identification datarecord included in the 
-  ReadECUIdentification positive response message. */
-
+void ondiagRequestSerial_Number_Read(){
+  /* The server sends an identificativoid ondatarecordincludedinthe()  ReadECUIdentificativoid onpositiveresponsemessage.*/()
   diagResponse this resp;
 
   if(!gDefaultSession)
@@ -193,54 +169,39 @@ on diagRequest Serial_Number_Read
   DiagSendResponse( resp);
 }
 
-on diagRequest "DEFAULT_SESSION_Start"
-{
-  /* The application functionality starts here the default session. */
-
+void ondiagRequest"DEFAULT_SESSION_Start"(){
+  /* The applicativoid onfunctionalitystartsherethedefaultsession.*/()
   diagResponse this resp;
 
-  gDefaultSession = 1;
-  gProgrammingSession = 0;
-
+  gDefaultSessivoid on=1;()  gProgrammingSessivoid on=0;()
   /* Sends the response object back to the tester. 
   Can only be called in the ECU simulation. */
   DiagSendResponse( resp);
 }
 
-on diagRequest "ProgrammingSession_Start"
-{
-  /* The application functionality starts here the programming session. */
-
+void ondiagRequest"ProgrammingSession_Start"(){
+  /* The applicativoid onfunctionalitystartsheretheprogrammingsession.*/()
   diagResponse this resp;
 
-  gDefaultSession = 0;
-  gProgrammingSession = 1;
-
+  gDefaultSessivoid on=0;()  gProgrammingSessivoid on=1;()
   /* Sends the response object back to the tester. 
   Can only be called in the ECU simulation. */
   DiagSendResponse( resp);
 }
 
-on diagRequest STOP_SESSION_Stop
-{
-  /* The application functionality stops 
-  here the active default session. */
+void ondiagRequestSTOP_SESSION_Stop(){
+  /* The applicativoid onfunctionalitystops()  here the active default session. */
 
   diagResponse this resp;
 
-  gDefaultSession = 0;
-  gProgrammingSession = 0;
-
+  gDefaultSessivoid on=0;()  gProgrammingSessivoid on=0;()
   /* Sends the response object back to the tester. 
   Can only be called in the ECU simulation. */
   DiagSendResponse(resp);
 }
 
-on diagRequest Coding_Read
-{
-  /* The server sends an identification datarecord included 
-  in the ReadECUIdentification positive response message.*/
-
+void ondiagRequestCoding_Read(){
+  /* The server sends an identificativoid ondatarecordincluded()  in the ReadECUIdentificativoid onpositiveresponsemessage.*/()
   diagResponse this resp;
 
   if(!gDefaultSession)
@@ -261,8 +222,7 @@ on diagRequest Coding_Read
   DiagSendResponse( resp);
 }
 
-on diagRequest FAULT_MEMORY_ReadAllIdentifiedTroubleCodes
-{
+void ondiagRequestFAULT_MEMORY_ReadAllIdentifiedTroubleCodes(){
   /* This request of the tester, will read the identified trouble code 
   of the ECU. The ECU will send back the List of selected DTC status */
   diagResponse this respFaultMem;
@@ -307,8 +267,7 @@ on diagRequest FAULT_MEMORY_ReadAllIdentifiedTroubleCodes
   complex parameter to the specified (numeric or symbolic) value. For this 
   first the complex parameter, that is, the name of the iteration, must be 
   specified; then the number of repetitions of the sub-parameter list that 
-  is the goal, and then the sub-parameter in the iteration itself. 
-  */
+  is the goal, and then the sub-parameter in the iterativoid onitself.()  */
   if(curDTC1)
   { 
     DiagSetComplexParameter( respFaultMem, "LIST_OF_DTC_AND_STATUS", count, "DTC",0x9001);
@@ -396,13 +355,11 @@ on diagRequest FAULT_MEMORY_ReadAllIdentifiedTroubleCodes
   DiagSendResponse(respFaultMem);
 }
 
-on diagRequest Tester_Present_Send_No_Response
-{
+void ondiagRequestTester_Present_Send_No_Response(){
   //send no response, because no response is required
 }
 
-on sysvar_update sysvar::NMTester::NMOnOff27
-{
+void onsysvar_updatesysvar::NMTester::NMOnOff27(){
   if(@this) 
   {
     canOffline(3); 

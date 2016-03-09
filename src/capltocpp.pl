@@ -14,6 +14,13 @@ sub wanted
     }
 }
 
+sub removeSpaces
+{
+    my ($word) = @_;
+    $word =~ s/\s//g;
+    return $word;
+}
+
 sub edit_file
 {
     my ($filename) = @_;
@@ -25,9 +32,14 @@ sub edit_file
     close(FILE);
     
     for($fileStr){
-        s/variables.*?\[.*?\]/hello/g;
-        s/on start/void onstart()/g;
-        s/on message/void onmessage()/g;
+        #convert callbacks to functions
+        s/on (.*?)\n/"void on".removeSpaces($1)."()"/ge;
+        #convert functions to c function
+        s/\n([a-zA-Z_]+\(.*?\)\s*\n)/void $1/g;
+        #remove variable block
+        s/variables\s*\n{((?>[^}{]+|(?R))*)}/$1/gs;
+        #remove includes block
+        s/includes\s*\n{((?>[^}{]+|(?R))*)}/$1/gs;
     }
 
     $filename =~ s/\.can/\.cpp/g;

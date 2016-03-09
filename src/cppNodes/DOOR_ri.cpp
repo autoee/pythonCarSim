@@ -1,26 +1,21 @@
-includes
-{
+
   /* You can source out constants, variables and functions 
      that are needed identically in multiple CAPL programs.*/
   #include "..\CAPL Includes\DoorInclFile.CIN"
   #include "..\CAPL Includes\NM_Observer_Include.cin"
-}
 
-variables
-{
-}
 
-on start
-{
-  // set to 2 to get more information into write-window
-  setWriteDbgLevel(1);
+
+
+
+void onstart(){
+  // set to 2 to get more informativoid onintowrite-window()  setWriteDbgLevel(1);
   writeDbgLevel(2,"%NODE_NAME%");
 
   SetMoveTimer();
 }
 
-on timer tMoveDownTimer
-{
+void ontimertMoveDownTimer(){
   if(gPosWN > 15 || gPosWN < 0 ) runError(1003,1003);
 
   if(gPosWN < 15  && gMoveDown == gTrue)
@@ -32,8 +27,7 @@ on timer tMoveDownTimer
   setTimer(this,cMoveTime);
 }
 
-on timer tMoveUpTimer
-{
+void ontimertMoveUpTimer(){
   if(gPosWN > 15 || gPosWN < 0) runError(1004,1004);
   
   if(gPosWN > 0 && gMoveUp == gTrue) 
@@ -45,8 +39,7 @@ on timer tMoveUpTimer
   setTimer(this,cMoveTime);
 }
 
-on Message Console_1
-{
+void onMessageConsole_1(){
   if(this.WN_right_up)
   { 
     gMoveUp = gTrue;
@@ -63,19 +56,16 @@ on Message Console_1
   else gMoveDown = gFalse;
 }
 
-on preStart
-{
+void onpreStart(){
   //fs canOffline(3);
 }
 
-on message Gateway_1
-{
+void onmessageGateway_1(){
    if(this.Ig_15  == 1)  canOnline(3);
    if(this.Ig_15R == 1)  canOnline(3);
 }
 
-on sysvar_update sysvar::NMTester::NMOnOff28
-{
+void onsysvar_updatesysvar::NMTester::NMOnOff28(){
   if(@this) 
   {
     canOffline(3); 
